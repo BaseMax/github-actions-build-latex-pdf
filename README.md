@@ -51,7 +51,7 @@ runs-on: ubuntu-latest
 steps:
 - uses: actions/checkout@v4
   - name: Build PDF
-    uses: BaseMax/github-actions-build-latex-pdf@v1.0.0
+    uses: BaseMax/github-actions-build-latex-pdf@v1
     with:
       tex_path: "main.tex"
 ```
@@ -61,7 +61,7 @@ steps:
 ## Example: Presentation Build
 
 ```
-- uses: BaseMax/github-actions-build-latex-pdf@v1.0.0
+- uses: BaseMax/github-actions-build-latex-pdf@v1
   with:
   tex_path: "slides.tex"
   build_format: "beamer"
@@ -72,7 +72,7 @@ steps:
 ## Example: Custom Output Name
 
 ```
-- uses: BaseMax/github-actions-build-latex-pdf@v1.0.0
+- uses: BaseMax/github-actions-build-latex-pdf@v1
   with:
   tex_path: "doc/report.tex"
   output_path: "output/final-report.pdf"
