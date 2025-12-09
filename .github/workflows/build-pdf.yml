@@ -1,0 +1,44 @@
+name: Build PDF
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build Docker image
+        run: |
+          docker build -t tex-builder .
+
+      - name: Run LaTeX builder
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/work" \
+            -w /work \
+            tex-builder
+
+      - name: Check PDF
+        run: ls -l ${{ github.workspace }}
+
+      - name: Upload PDF artifact with date-time
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+          NEW_NAME="backend-assignment-$TIMESTAMP.pdf"
+          cp backend-assignment.pdf $NEW_NAME
+        shell: bash
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: backend-assignment-pdf
+          path: backend-assignment-*.pdf
+v
