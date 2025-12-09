@@ -1,0 +1,51 @@
+name: "Build LaTeX PDF"
+description: "Compile LaTeX .tex files into PDF using a prebuilt Docker image from Docker Hub."
+author: "Seyyed Ali Mohammadiyeh (Max Base)"
+branding:
+  icon: "file-text"
+  color: "blue"
+
+inputs:
+  tex_path:
+    description: "Path to the input .tex file (required)"
+    required: true
+
+  output_path:
+    description: "Optional output PDF filename. Default = <input_name>.pdf"
+    required: false
+    default: ""
+
+outputs:
+  pdf:
+    description: "Path to the generated PDF file"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Docker-based LaTeX builder
+      shell: bash
+      run: |
+        TEX="${{ inputs.tex_path }}"
+
+        if [ ! -f "$TEX" ]; then
+          echo "::error::Input TEX file not found: $TEX"
+          exit 1
+        fi
+
+        BASENAME=$(basename "$TEX" .tex)
+
+        if [ -z "${{ inputs.output_path }}" ]; then
+          OUTPDF="${BASENAME}.pdf"
+        else
+          OUTPDF="${{ inputs.output_path }}"
+        fi
+
+        echo "Compiling using basemax/latex-builder Docker image..."
+
+        docker run --rm \
+          -v "${{ github.workspace }}:/work" \
+          -w /work \
+          basemax/latex-builder \
+          sh -c "pdflatex -interaction=nonstopmode $TEX && mv ${BASENAME}.pdf $OUTPDF"
+
+        echo "pdf=$OUTPDF" >> $GITHUB_OUTPUT
